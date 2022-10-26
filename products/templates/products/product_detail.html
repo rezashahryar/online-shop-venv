@@ -1,0 +1,179 @@
+{% extends '_base.html' %}
+{% load static %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}
+product_detail
+{% endblock %}
+
+
+{% block content %}
+
+
+    <!-- Product Details Section Begin -->
+    <section class="product-details spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-6">
+                    <div class="product__details__pic">
+                        <div class="product__details__pic__item">
+                            <img class="product__details__pic__item--large"
+                                src="{{ product.cover.url }}" alt="">
+                        </div>
+
+                        <div class="product__details__pic__slider owl-carousel">
+                            {% if product.cover_number_one %}
+                            <img style="border-radius: 10px;" data-imgbigurl="{{ product.cover_number_one.url }}"
+                                src="{{ product.cover_number_one.url }}" alt="">
+                            {% endif %}
+                        {% if product.cover2 %}
+                            <img style="border-radius: 10px;" data-imgbigurl="{{ product.cover2.url }}"
+                                src="{{ product.cover2.url }}" alt="">
+                        {% endif %}
+                        {% if product.cover3 %}
+                            <img style="border-radius: 10px;" data-imgbigurl="{{ product.cover3.url }}"
+                                src="{{ product.cover3.url }}" alt="">
+                        {% endif %}
+                        {% if product.cover4 %}
+                            <img style="border-radius: 10px;" data-imgbigurl="{{ product.cover4.url }}"
+                                src="{{ product.cover4.url }}" alt="">
+                        {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="product__details__text">
+                        <h3 style="text-align: right;direction: rtl;">{{product.title}}</h3>
+                        <div class="product__details__rating">
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star-half-o"></i>
+                            <span>({{ product.comments.count }} reviews)</span>
+                        </div>
+                        <div class="product__details__price">{{product.price}} T</div>
+                        <p dir="rtl">{{ product.description|truncatewords:12 }}</p>
+                        <form action="{% url 'cart:cart_add' product.id %}" method="post">
+                            {% csrf_token %}
+{#                            {{ add_to_cart_form|crispy }}#}
+                            <td class="shoping__cart__quantity">
+                                <div class="quantity">
+                                    <div class="pro-qty">
+                                        <input type="text" min="1" max="29" name="quantity" value="1">
+                                    </div>
+                                </div>
+                            </td>
+                            <button class="btn btn-success" type="submit">{% trans 'add to cart' %}</button>
+                        </form>
+{#                        <a href="#" class="primary-btn update-cart">ADD TO CARD</a>#}
+
+
+                        <ul>
+                            <li><b>Availability</b> <span>In Stock</span></li>
+                            <li><b>Shipping</b> <span>01 day shipping. <samp>Free pickup today</samp></span></li>
+                            <li><b>Weight</b> <span>0.5 kg</span></li>
+                            <li><b>Share on</b>
+                                <div class="share">
+                                    <a href="#"><i class="fa fa-facebook"></i></a>
+                                    <a href="#"><i class="fa fa-twitter"></i></a>
+                                    <a href="#"><i class="fa fa-instagram"></i></a>
+                                    <a href="#"><i class="fa fa-pinterest"></i></a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="product__details__tab">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab"
+                                    aria-selected="true">{% trans 'Description' %}</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab"
+                                    aria-selected="false">{% trans 'Reviews' %} <span>({{ product.comments.count }})</span></a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tabs-1" role="tabpanel">
+                                <div class="product__details__tab__desc">
+                                    <h6>{% trans 'Products Information' %}</h6>
+                                    <p id="reza">{{ product.description }}</p>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="tabs-3" role="tabpanel">
+                                <div class="product__details__tab__desc">
+                                    <h6>{% trans 'Product Comment' %}</h6>
+                                <ul>
+                                    <li>
+                                    {% for comment in product.comments.all %}
+                                    <strong>{{ comment.author.username }}</strong>
+                                        <span>-</span>
+                                        <span>{{ comment.datetime_created|timesince }}</span>
+                                        <span> | </span>
+                                        <span>{{ comment.datetime_created|date }}</span>
+                                        <span> | </span>
+                                        <span>{{ comment.datetime_created|time }}</span>
+                                        <span> | </span>
+                                        <span><strong>{{ comment.get_stars_display }}</strong></span>
+                                        <p>{{ comment.body }}</p>
+                                    {% endfor %}
+                                    </li>
+                                </ul>
+                                </div>
+                                <br>
+                                {% if user.is_authenticated %}
+                                <form action="{% url 'products:comment_create' product.id %}" method="post">
+                                    {% csrf_token %}
+                                    {{ comment_form|crispy }}
+                                    <input class="btn btn-success" type="submit" value="{% trans 'submit' %}">
+                                </form>
+                            {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Product Details Section End -->
+
+    <!-- Related Product Section Begin -->
+    <section class="related-product">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="section-title related__product__title">
+                        <h2>Related Product</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                {% for recent in recents %}
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="product__item">
+                        <div class="product__item__pic set-bg" data-setbg="{% static 'img/product/product-1.jpg' %}">
+                            <ul class="product__item__pic__hover">
+                                <li><a href="#"><i class="fa fa-heart"></i></a></li>
+                                <li><a href="#"><i class="fa fa-retweet"></i></a></li>
+                                <li><a href="#"><i class="fa fa-shopping-cart"></i></a></li>
+                            </ul>
+                        </div>
+                        <div class="product__item__text">
+                            <h6><a href="#">Crab Pool Security</a></h6>
+                            <h5>$30.00</h5>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+
+
+            </div>
+        </div>
+    </section>
+    <!-- Related Product Section End -->
+{% endblock content %}
